@@ -923,6 +923,12 @@ function setLoggedIn(user){
   var btn=document.getElementById('startFreeBtn');
   btn.textContent='Log out';
   btn.title='Log out';
+  /* Record the signed-in account in the local members list so the admin
+     Members page actually lists accounts that log in / sign up here
+     (saveUser lives in the store script below and dedupes by email). */
+  try{
+    if(user&&typeof saveUser==='function') saveUser((user.user_metadata&&user.user_metadata.name)||'',user.email||'');
+  }catch(e){}
   checkAdmin(user);
 }
 function setLoggedOut(){
