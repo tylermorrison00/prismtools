@@ -405,11 +405,19 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
       <a href="#product">Tools</a><a href="#how">How It Works</a><a href="#cta">Calculator</a>
     </div>
     <div class="nav-right">
-      <div class="ideas-menu-wrap">
+      <div class="ideas-menu-wrap" id="giveIdeasWrap">
         <button type="button" class="talk" id="giveIdeasBtn" aria-haspopup="true" aria-expanded="false">Give Ideas/Reviews</button>
         <div class="ideas-menu" id="ideasMenu" role="menu">
           <button type="button" role="menuitem" id="ideasMenuReviews">Give Review</button>
           <button type="button" role="menuitem" id="ideasMenuGive">Give Ideas</button>
+        </div>
+      </div>
+      <div class="ideas-menu-wrap" id="adminMenuWrap" hidden>
+        <button type="button" class="talk" id="adminPageBtn" aria-haspopup="true" aria-expanded="false">Admin Page</button>
+        <div class="ideas-menu" id="adminMenu" role="menu">
+          <button type="button" role="menuitem" id="adminMenuMembers">Members</button>
+          <button type="button" role="menuitem" id="adminMenuReviews">Reviews</button>
+          <button type="button" role="menuitem" id="adminMenuIdeas">Ideas</button>
         </div>
       </div>
       <button type="button" class="btn btn-white" id="startFreeBtn" style="padding:9px 18px">Start free</button>
@@ -417,7 +425,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#product">Tools</a><a href="#how">How It Works</a><a href="#cta">Calculator</a><a href="#" id="giveIdeasMobile">Give Ideas</a>
+    <a href="#product">Tools</a><a href="#how">How It Works</a><a href="#cta">Calculator</a><a href="#" id="giveIdeasMobile">Give Ideas</a><a href="#" class="admin-mobile-link" data-view="adminMembers" hidden>Members</a><a href="#" class="admin-mobile-link" data-view="adminReviews" hidden>Reviews</a><a href="#" class="admin-mobile-link" data-view="adminIdeas" hidden>Ideas</a>
   </div>
 </header>
 
@@ -572,7 +580,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
     </div>
     <div class="foot-bottom">
       <span>© 2026 Prism Tools. All rights reserved.</span>
-      <a href="#" id="adminLink" class="admin-link">Admin</a>
+      <a href="#" id="adminLink" class="admin-link" hidden>Admin</a>
     </div>
   </div>
 </footer>
@@ -667,19 +675,40 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
   </div>
 </div>
 
-<!-- ============ ADMIN PAGE ============ -->
-<div id="adminView" hidden>
+<!-- ============ ADMIN PAGE: MEMBERS ============ -->
+<div id="adminMembersView" hidden>
   <div class="wrap detail-wrap">
     <button type="button" class="btn btn-ghost back-btn" data-back>← Back to site</button>
-    <h1 class="admin-h">Admin</h1>
-    <p class="admin-sub">Approve reviews and ideas to show them on the site, or remove them to the Bin.</p>
+    <h1 class="admin-h">Members</h1>
+    <p class="admin-sub">Registered users of Prism Tools.</p>
+    <section class="admin-card"><h3>Registered users</h3><div id="adminUsers"></div></section>
+  </div>
+</div>
+
+<!-- ============ ADMIN PAGE: REVIEWS ============ -->
+<div id="adminReviewsView" hidden>
+  <div class="wrap detail-wrap">
+    <button type="button" class="btn btn-ghost back-btn" data-back>← Back to site</button>
+    <h1 class="admin-h">Reviews</h1>
+    <p class="admin-sub">Approve reviews to show them on the site, or remove them to the Bin.</p>
     <div class="admin-grid">
       <section class="admin-card"><h3>Pending reviews</h3><div id="adminPendingReviews"></div></section>
-      <section class="admin-card"><h3>Pending ideas</h3><div id="adminPendingIdeas"></div></section>
       <section class="admin-card"><h3>Approved reviews</h3><div id="adminApprovedReviews"></div></section>
-      <section class="admin-card"><h3>Ideas</h3><div id="adminApprovedIdeas"></div></section>
-      <section class="admin-card"><h3>Registered users</h3><div id="adminUsers"></div></section>
-      <section class="admin-card"><h3>Bin</h3><div id="adminBin"></div></section>
+      <section class="admin-card"><h3>Bin</h3><div id="adminBinReviews"></div></section>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN PAGE: IDEAS ============ -->
+<div id="adminIdeasView" hidden>
+  <div class="wrap detail-wrap">
+    <button type="button" class="btn btn-ghost back-btn" data-back>← Back to site</button>
+    <h1 class="admin-h">Ideas</h1>
+    <p class="admin-sub">Approve ideas, or remove them to the Bin.</p>
+    <div class="admin-grid">
+      <section class="admin-card"><h3>Pending ideas</h3><div id="adminPendingIdeas"></div></section>
+      <section class="admin-card"><h3>Approved ideas</h3><div id="adminApprovedIdeas"></div></section>
+      <section class="admin-card"><h3>Bin</h3><div id="adminBinIdeas"></div></section>
     </div>
   </div>
 </div>
@@ -829,6 +858,26 @@ document.addEventListener('click',function(e){ if(!ideasMenu.contains(e.target))
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeIdeasMenu(); });
 document.getElementById('giveIdeasMobile').addEventListener('click',function(e){ e.preventDefault(); openFeedback('idea'); });
 
+// Admin Page: header dropdown (admins only) — Members / Reviews / Ideas open full pages
+var adminPageBtn=document.getElementById('adminPageBtn');
+var adminMenu=document.getElementById('adminMenu');
+function closeAdminMenu(){ if(adminMenu) adminMenu.classList.remove('open'); if(adminPageBtn) adminPageBtn.setAttribute('aria-expanded','false'); }
+if(adminPageBtn&&adminMenu){
+  adminPageBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var open=adminMenu.classList.toggle('open');
+    adminPageBtn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  document.getElementById('adminMenuMembers').addEventListener('click',function(){ closeAdminMenu(); showView('adminMembers'); });
+  document.getElementById('adminMenuReviews').addEventListener('click',function(){ closeAdminMenu(); showView('adminReviews'); });
+  document.getElementById('adminMenuIdeas').addEventListener('click',function(){ closeAdminMenu(); showView('adminIdeas'); });
+  document.addEventListener('click',function(e){ if(!adminMenu.contains(e.target)) closeAdminMenu(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeAdminMenu(); });
+}
+document.querySelectorAll('.admin-mobile-link').forEach(function(a){
+  a.addEventListener('click',function(e){ e.preventDefault(); showView(a.getAttribute('data-view')); });
+});
+
 document.getElementById('ideasClose').addEventListener('click',function(){ document.getElementById('ideasNote').classList.remove('show'); });
 
 // Start free: login / create-account popup (Supabase Auth)
@@ -836,23 +885,53 @@ var authModal=document.getElementById('authModal');
 function openAuth(){ authModal.classList.add('open'); }
 function closeAuth(){ authModal.classList.remove('open'); }
 var currentUser=null;
+var isAdminUser=false;
 var sb=null;
 if(window.supabase){
   sb=window.supabase.createClient('https://pmyroxekhsummcbxbfxk.supabase.co','sb_publishable_rGLl0RmoZH8jd-2OHFmlgw_Af8aAix9');
 }
 function authNote(msg,isErr){ var n=document.getElementById('authNote'); n.textContent=msg; n.style.color=isErr?'#f27bb5':''; n.style.display='block'; }
+/* Admin check: look up is_admin on the current user's row in the Supabase profiles table.
+   Admins get the "Admin Page" header menu + footer Admin link and lose "Give Ideas/Reviews";
+   everyone else keeps "Give Ideas/Reviews" and never sees the admin UI. */
+function applyRoleUI(){
+  var giveWrap=document.getElementById('giveIdeasWrap');
+  var adminWrap=document.getElementById('adminMenuWrap');
+  var adminLink=document.getElementById('adminLink');
+  var giveMobile=document.getElementById('giveIdeasMobile');
+  if(giveWrap) giveWrap.hidden=isAdminUser;
+  if(adminWrap) adminWrap.hidden=!isAdminUser;
+  if(adminLink) adminLink.hidden=!isAdminUser;
+  if(giveMobile) giveMobile.hidden=isAdminUser;
+  document.querySelectorAll('.admin-mobile-link').forEach(function(a){ a.hidden=!isAdminUser; });
+  if(!isAdminUser&&typeof showView==='function'&&typeof currentView!=='undefined'&&(currentView==='adminMembers'||currentView==='adminReviews'||currentView==='adminIdeas')) showView('main');
+}
+async function checkAdmin(user){
+  isAdminUser=false;
+  applyRoleUI();
+  if(!sb||!user) return;
+  try{
+    var res=await sb.from('profiles').select('is_admin').eq('id',user.id).single();
+    if(currentUser&&currentUser.id===user.id){
+      isAdminUser=!!(!res.error&&res.data&&res.data.is_admin);
+      applyRoleUI();
+    }
+  }catch(e){ /* no profile row / lookup failed: stays non-admin */ }
+}
 function setLoggedIn(user){
   currentUser=user;
   var btn=document.getElementById('startFreeBtn');
-  var nm=(user.user_metadata&&user.user_metadata.name)||user.email||'';
-  btn.textContent=nm?('Hi, '+String(nm).split(' ')[0]):'My account';
-  btn.title=(user.email||'')+' — click to log out';
+  btn.textContent='Log out';
+  btn.title='Log out';
+  checkAdmin(user);
 }
 function setLoggedOut(){
   currentUser=null;
+  isAdminUser=false;
   var btn=document.getElementById('startFreeBtn');
   btn.textContent='Start free';
   btn.title='';
+  applyRoleUI();
 }
 document.getElementById('startFreeBtn').addEventListener('click',function(){
   if(currentUser&&sb){ sb.auth.signOut(); return; }
@@ -1004,18 +1083,20 @@ var SAMPLE_REVIEWS=[
 function approvedReviews(){ return DB.reviews.filter(function(r){ return r.status==='approved'; }); }
 
 /* ===== Views ===== */
-var VIEWS={main:document.getElementById('mainView'),detail:document.getElementById('detailView'),admin:document.getElementById('adminView')};
+var VIEWS={main:document.getElementById('mainView'),detail:document.getElementById('detailView'),adminMembers:document.getElementById('adminMembersView'),adminReviews:document.getElementById('adminReviewsView'),adminIdeas:document.getElementById('adminIdeasView')};
 var currentView='main';
+function isAdminView(name){ return name==='adminMembers'||name==='adminReviews'||name==='adminIdeas'; }
 function showView(name){
+  if(isAdminView(name)&&!isAdminUser) name='main';
   currentView=name;
   Object.keys(VIEWS).forEach(function(k){ VIEWS[k].hidden=(k!==name); });
   window.scrollTo(0,0);
-  if(name==='admin') renderAdmin();
+  if(isAdminView(name)) renderAdmin();
 }
 document.querySelectorAll('[data-back]').forEach(function(b){ b.addEventListener('click',function(){ showView('main'); }); });
 document.getElementById('sideDockPreview').addEventListener('click',function(){ renderDetail(); showView('detail'); });
 document.getElementById('heroPill').addEventListener('click',function(e){ e.preventDefault(); renderDetail(); showView('detail'); });
-document.getElementById('adminLink').addEventListener('click',function(e){ e.preventDefault(); showView('admin'); });
+document.getElementById('adminLink').addEventListener('click',function(e){ e.preventDefault(); showView('adminReviews'); });
 
 /* Nav / in-page section links: work from every view; Tools (#product) lands centred in the viewport */
 function centreScrollTo(el){
@@ -1140,11 +1221,10 @@ function renderAdmin(){
   document.getElementById('adminApprovedReviews').innerHTML=ar.length?ar.map(function(r){ return adminItem(r,'review',btn('remove','review',r.id,'Remove',true)); }).join(''):emptyMsg('No approved reviews yet.');
   document.getElementById('adminApprovedIdeas').innerHTML=ai.length?ai.map(function(i){ return adminItem(i,'idea',btn('remove','idea',i.id,'Remove',true)); }).join(''):emptyMsg('No approved ideas yet.');
   document.getElementById('adminUsers').innerHTML=DB.users.length?DB.users.map(function(u){ return '<div class="admin-email">'+esc(u.email)+(u.name?' — '+esc(u.name):'')+'</div>'; }).join(''):emptyMsg('No registered users yet.');
-  var binHtml=binR.map(function(r){ return adminItem(r,'review',btn('restore','review',r.id,'Restore')+btn('purge','review',r.id,'Permanent Delete',true)); }).join('')
-    + binI.map(function(i){ return adminItem(i,'idea',btn('restore','idea',i.id,'Restore')+btn('purge','idea',i.id,'Permanent Delete',true)); }).join('');
-  document.getElementById('adminBin').innerHTML=binHtml||emptyMsg('Bin is empty.');
+  document.getElementById('adminBinReviews').innerHTML=binR.length?binR.map(function(r){ return adminItem(r,'review',btn('restore','review',r.id,'Restore')+btn('purge','review',r.id,'Permanent Delete',true)); }).join(''):emptyMsg('Bin is empty.');
+  document.getElementById('adminBinIdeas').innerHTML=binI.length?binI.map(function(i){ return adminItem(i,'idea',btn('restore','idea',i.id,'Restore')+btn('purge','idea',i.id,'Permanent Delete',true)); }).join(''):emptyMsg('Bin is empty.');
 }
-document.getElementById('adminView').addEventListener('click',function(e){
+function adminActionClick(e){
   var b=e.target.closest?e.target.closest('[data-act]'):null;
   if(!b) return;
   var act=b.getAttribute('data-act'), kind=b.getAttribute('data-kind'), id=b.getAttribute('data-id');
@@ -1158,7 +1238,8 @@ document.getElementById('adminView').addEventListener('click',function(e){
   persist();
   renderAll();
   renderAdmin();
-});
+}
+['adminMembersView','adminReviewsView','adminIdeasView'].forEach(function(vid){ var v=document.getElementById(vid); if(v) v.addEventListener('click',adminActionClick); });
 
 function renderAll(){ renderMainReviews(); renderDetail(); }
 renderAll();
