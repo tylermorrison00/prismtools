@@ -382,6 +382,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
 /* no animation: rest the toolbox icons in their final row instead of stacked at the box centre */
 .tb-icon.i1{left:4%;margin-left:0}.tb-icon.i2{left:29%;margin-left:0}.tb-icon.i3{left:55%;margin-left:0}.tb-icon.i4{left:79%;margin-left:0}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -677,7 +678,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
 <!-- Give Ideas note -->
 <div class="ideas-note" id="ideasNote" role="status"><span><b>Give Ideas</b> — Coming soon</span><button type="button" id="ideasClose" aria-label="Close note">✕</button></div>
 
-<!-- Login / Create account popup (front-end UI only) -->
+<!-- Login / Create account popup (Supabase Auth) -->
 <div class="modal-overlay" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
   <div class="modal">
     <button type="button" class="modal-close" id="authClose" aria-label="Close">✕</button>
@@ -698,7 +699,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
       <div><label for="createPass">Password</label><input id="createPass" type="password" required placeholder="Choose a password" autocomplete="new-password"/></div>
       <button type="submit" class="btn btn-white">Create account</button>
     </form>
-    <p class="auth-note" id="authNote">Accounts are coming soon — this popup is a preview for now.</p>
+    <p class="auth-note" id="authNote"></p>
   </div>
 </div>
 
@@ -821,11 +822,33 @@ document.getElementById('giveIdeasMobile').addEventListener('click',function(e){
 
 document.getElementById('ideasClose').addEventListener('click',function(){ document.getElementById('ideasNote').classList.remove('show'); });
 
-// Start free: login / create-account popup (front-end UI only, account flow comes later)
+// Start free: login / create-account popup (Supabase Auth)
 var authModal=document.getElementById('authModal');
 function openAuth(){ authModal.classList.add('open'); }
 function closeAuth(){ authModal.classList.remove('open'); }
-document.getElementById('startFreeBtn').addEventListener('click',openAuth);
+var currentUser=null;
+var sb=null;
+if(window.supabase){
+  sb=window.supabase.createClient('https://pmyroxekhsummcbxbfxk.supabase.co','sb_publishable_rGLl0RmoZH8jd-2OHFmlgw_Af8aAix9');
+}
+function authNote(msg,isErr){ var n=document.getElementById('authNote'); n.textContent=msg; n.style.color=isErr?'#f27bb5':''; n.style.display='block'; }
+function setLoggedIn(user){
+  currentUser=user;
+  var btn=document.getElementById('startFreeBtn');
+  var nm=(user.user_metadata&&user.user_metadata.name)||user.email||'';
+  btn.textContent=nm?('Hi, '+String(nm).split(' ')[0]):'My account';
+  btn.title=(user.email||'')+' — click to log out';
+}
+function setLoggedOut(){
+  currentUser=null;
+  var btn=document.getElementById('startFreeBtn');
+  btn.textContent='Start free';
+  btn.title='';
+}
+document.getElementById('startFreeBtn').addEventListener('click',function(){
+  if(currentUser&&sb){ sb.auth.signOut(); return; }
+  openAuth();
+});
 document.getElementById('authClose').addEventListener('click',closeAuth);
 authModal.addEventListener('click',function(e){ if(e.target===authModal) closeAuth(); });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeAuth(); document.getElementById('ideasNote').classList.remove('show'); } });
@@ -837,21 +860,39 @@ function setAuthTab(create){
   tabCreate.setAttribute('aria-selected',create?'true':'false');
   document.getElementById('loginForm').classList.toggle('active',!create);
   document.getElementById('createForm').classList.toggle('active',create);
-  document.getElementById('authNote').style.display='none';
+  var n=document.getElementById('authNote'); n.style.display='none'; n.style.color='';
 }
 tabLogin.addEventListener('click',function(){ setAuthTab(false); });
 tabCreate.addEventListener('click',function(){ setAuthTab(true); });
-document.getElementById('loginForm').addEventListener('submit',function(e){ e.preventDefault(); document.getElementById('authNote').style.display='block'; });
-document.getElementById('createForm').addEventListener('submit',function(e){
+document.getElementById('loginForm').addEventListener('submit',async function(e){
   e.preventDefault();
-  var em=document.getElementById('createEmail').value.trim();
-  var nm=document.getElementById('createName').value.trim();
-  if(em) saveUser(nm,em);
-  var note=document.getElementById('authNote');
-  note.textContent='Account created — welcome to Prism Tools!';
-  note.style.display='block';
+  if(!sb){ authNote('Sign-in is unavailable right now. Please try again later.',true); return; }
+  authNote('Signing you in…');
+  var res=await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value.trim(),password:document.getElementById('loginPass').value});
+  if(res.error){ authNote(res.error.message,true); return; }
   this.reset();
+  closeAuth();
+  setLoggedIn(res.data.user);
 });
+document.getElementById('createForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(!sb){ authNote('Sign-up is unavailable right now. Please try again later.',true); return; }
+  authNote('Creating your account…');
+  var nm=document.getElementById('createName').value.trim();
+  var res=await sb.auth.signUp({email:document.getElementById('createEmail').value.trim(),password:document.getElementById('createPass').value,options:{data:{name:nm}}});
+  if(res.error){ authNote(res.error.message,true); return; }
+  this.reset();
+  if(res.data.user&&!res.data.session){
+    authNote('Account created — please check your email to confirm it, then log in.');
+  }else{
+    closeAuth();
+    setLoggedIn(res.data.user);
+  }
+});
+if(sb){
+  sb.auth.getSession().then(function(res){ if(res.data&&res.data.session&&res.data.session.user) setLoggedIn(res.data.session.user); });
+  sb.auth.onAuthStateChange(function(_ev,session){ if(session&&session.user) setLoggedIn(session.user); else setLoggedOut(); });
+}
 
 // Give Ideas popup — separate popup, idea form only (front-end preview only)
 var ideaModal=document.getElementById('ideaModal');
