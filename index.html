@@ -632,9 +632,9 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
       <div>
         <h1>Side Dock</h1>
         <p class="store-sub">A desktop sidebar that keeps your everyday tools in one place — notes, checklist, calendar, calculator and a habit tracker, always one click away.</p>
-        <div class="rating-row"><span class="stars-static" id="dStarsTop"></span><span id="dRatingText"></span></div>
+        <div class="rating-row" hidden><span class="stars-static" id="dStarsTop"></span><span id="dRatingText"></span></div>
         <div class="store-actions">
-          <a class="btn btn-white" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.0/Side.Dock.1.0.0.exe" download>Download</a>
+          <a class="btn btn-white" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.1/Side.Dock.Setup.1.0.1.exe" download>Download</a>
           <button type="button" class="btn btn-ghost" id="dWriteReviewBtn">Write a review</button>
         </div>
       </div>
@@ -1211,14 +1211,19 @@ function renderDetail(){
   var avg=all.length?sum/all.length:0;
   var starsTop=document.getElementById('dStarsTop');
   var ratingText=document.getElementById('dRatingText');
+  var ratingRow=starsTop.parentElement;
   if(all.length){
+    ratingRow.hidden=false;
     starsTop.innerHTML=starsHTML(Math.round(avg));
     starsTop.hidden=false;
+    ratingText.hidden=false;
     ratingText.textContent=avg.toFixed(1)+' · '+all.length+' review'+(all.length===1?'':'s');
   }else{
     starsTop.innerHTML='';
     starsTop.hidden=true;
-    ratingText.textContent='No reviews yet';
+    ratingText.textContent='';
+    ratingText.hidden=true;
+    ratingRow.hidden=true;
   }
   document.getElementById('dReviewsSection').hidden=!all.length;
   document.getElementById('dReviewList').innerHTML=all.map(function(r){
