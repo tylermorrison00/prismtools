@@ -414,11 +414,28 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
 @media (max-width:760px){
   .nav-links,.nav-right .talk{display:none}
   .burger{display:block}
-  .wrap{padding:0 20px}.nav{padding:0 20px}
+  .wrap{padding:0 24px}.nav{padding:0 20px}
   .hero{padding-top:70px}
   .foot-grid{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr 1fr}
   section.block{padding-top:70px}
+  /* Mobile side breathing room for the tools + how-it-works sections:
+     the "Our tools" heading/lede, the Side Dock folder card and the
+     "Start free, upgrade when you need more." heading were touching the
+     screen edges, so these two sections get wider side padding on phones
+     (desktop is untouched). */
+  #product,#how{padding-left:28px;padding-right:28px}
+  /* The folder card must fit inside that padded width — its old
+     minmax(320px,400px) column could meet or exceed a narrow phone's
+     content width and push the card to the edge. */
+  .tools-grid{grid-template-columns:minmax(0,1fr);width:100%}
+  .tool-card{padding:30px 24px 28px}
+  .coming-soon{width:100%}
+  /* The two filter pills (min-width 170px each + gap) were wider than a
+     small phone's padded content width; let them shrink to share the row
+     inside the padding instead of forcing the page wider. */
+  .tool-filter{width:100%;gap:10px}
+  .filter-pill{flex:1 1 0;min-width:0;padding:13px 16px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}
 /* no animation: rest the toolbox icons in their final row instead of stacked at the box centre */
