@@ -310,7 +310,9 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
 .rating-row{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14.5px;color:var(--muted);flex-wrap:wrap}
 .stars-static{color:#f5d76e;font-size:18px;letter-spacing:2px;white-space:nowrap}
 .stars-static .off{color:#3a3d47}
-.store-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.store-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;align-items:center}
+.dl-count{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;color:var(--muted);font-weight:500;white-space:nowrap}
+.dl-count svg{width:16px;height:16px;flex:none;color:var(--muted2)}
 .detail-h{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:52px 0 18px}
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .shot{margin:0;background:var(--card);border:1px solid var(--line2);border-radius:16px;overflow:hidden}
@@ -634,8 +636,9 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
         <p class="store-sub">A desktop sidebar that keeps your everyday tools in one place — notes, checklist, calendar, calculator and a habit tracker, always one click away.</p>
         <div class="rating-row" hidden><span class="stars-static" id="dStarsTop"></span><span id="dRatingText"></span></div>
         <div class="store-actions">
-          <a class="btn btn-white" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.0/Side.Dock.Setup.1.0.0.exe" download>Download</a>
+          <a class="btn btn-white" id="dDownloadBtn" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.0/Side.Dock.Setup.1.0.0.exe" download>Download</a>
           <button type="button" class="btn btn-ghost" id="dWriteReviewBtn">Write a review</button>
+          <span class="dl-count" id="dDownloads" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span id="dDownloadsText"></span></span>
         </div>
       </div>
     </div>
@@ -1200,9 +1203,44 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a){
   a.addEventListener('click',function(e){ e.preventDefault(); goSection(hash); });
 });
 
+/* ===== Detail page: downloads count (Supabase tool_downloads) =====
+   On load, read the 'side-dock' row and show it beside Write a review
+   (e.g. "1,234 downloads"). Every Download click calls the
+   increment_downloads RPC (+1) and updates the display; the anchor's
+   own direct download is never intercepted. */
+var dDownloadsText=document.getElementById('dDownloadsText');
+var dDownloadCount=null;
+function setDownloads(n){
+  if(typeof n!=='number'||isNaN(n)) return;
+  dDownloadCount=n;
+  if(dDownloadsText) dDownloadsText.textContent=n.toLocaleString('en-US')+(n===1?' download':' downloads');
+}
+async function loadDownloads(){
+  if(!sb||!dDownloadsText) return;
+  try{
+    var res=await sb.from('tool_downloads').select('downloads').eq('tool_slug','side-dock').single();
+    if(!res.error&&res.data&&res.data.downloads!=null) setDownloads(Number(res.data.downloads));
+  }catch(e){ /* count unavailable: leave the label blank rather than show a wrong number */ }
+}
+var dDownloadBtn=document.getElementById('dDownloadBtn');
+if(dDownloadBtn){
+  dDownloadBtn.addEventListener('click',function(){
+    /* Optimistic +1 so the number moves the moment the button is clicked;
+       the RPC result then reconciles it with the real stored count. The
+       click itself is NOT prevented — the file downloads directly. */
+    if(dDownloadCount!==null) setDownloads(dDownloadCount+1);
+    if(!sb) return;
+    sb.rpc('increment_downloads',{p_slug:'side-dock'}).then(function(res){
+      if(!res.error&&res.data!=null) setDownloads(Number(res.data));
+    }).catch(function(){});
+  });
+}
+loadDownloads();
+
 /* ===== Detail page: rating, review list, review form ===== */
 var dRating=0;
 function renderDetail(){
+  loadDownloads();
   /* Only approved reviews ever show. With none approved, the whole Reviews
      display (heading + list + rating summary) stays hidden — the Write a
      review form below is always available. */
