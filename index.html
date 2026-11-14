@@ -525,7 +525,19 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
     </div>
   </div>
 
-  <div class="coming-soon" id="mobileTools" hidden>Coming soon</div>
+  <div class="tools-grid" id="mobileTools" hidden>
+    <div class="tool-card">
+      <div class="tool-head">
+        <div class="tool-logo"><img src="data:image/png;base64,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" alt="Side Dock logo"/></div>
+        <h3>Side Dock Mobile</h3>
+      </div>
+      <p>Everyday tools on your Android phone — Tasks, Notes & Habits with Cloud Sync.</p>
+      <div class="tool-actions">
+        <a class="btn btn-white" href="https://github.com/tylermorrison00/sidedocks/releases/download/mobile-v1.0.0/app-release.apk" download>Download APK <span aria-hidden="true">↓</span></a>
+        <button type="button" class="btn btn-ghost tool-preview" id="sideDockMobilePreview">Preview <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- HOW IT WORKS -->
@@ -636,7 +648,8 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
         <p class="store-sub">A desktop sidebar that keeps your everyday tools in one place — notes, checklist, calendar, calculator and a habit tracker, always one click away.</p>
         <div class="rating-row" hidden><span class="stars-static" id="dStarsTop"></span><span id="dRatingText"></span></div>
         <div class="store-actions">
-          <a class="btn btn-white" id="dDownloadBtn" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.0/Side.Dock.Setup.1.0.0.exe" download>Download</a>
+          <a class="btn btn-white" id="dDownloadBtn" href="https://github.com/tylermorrison00/sidedocks/releases/download/v1.0.0/Side.Dock.Setup.1.0.0.exe" download>Download (Windows)</a>
+          <a class="btn btn-white" id="dDownloadApkBtn" href="https://github.com/tylermorrison00/sidedocks/releases/download/mobile-v1.0.0/app-release.apk" download style="margin-left:6px;">Download (Android APK)</a>
           <button type="button" class="btn btn-ghost" id="dWriteReviewBtn">Write a review</button>
           <span class="dl-count" id="dDownloads" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span id="dDownloadsText"></span></span>
         </div>
@@ -1154,6 +1167,8 @@ function showView(name){
 }
 document.querySelectorAll('[data-back]').forEach(function(b){ b.addEventListener('click',function(){ showView('main'); }); });
 document.getElementById('sideDockPreview').addEventListener('click',function(){ renderDetail(); showView('detail'); });
+var sideDockMobilePreview=document.getElementById('sideDockMobilePreview');
+if(sideDockMobilePreview){ sideDockMobilePreview.addEventListener('click',function(){ renderDetail(); showView('detail'); }); }
 document.getElementById('heroPill').addEventListener('click',function(e){ e.preventDefault(); renderDetail(); showView('detail'); });
 document.getElementById('adminLink').addEventListener('click',function(e){ e.preventDefault(); showView('adminReviews'); });
 
@@ -1228,6 +1243,16 @@ if(dDownloadBtn){
     /* Optimistic +1 so the number moves the moment the button is clicked;
        the RPC result then reconciles it with the real stored count. The
        click itself is NOT prevented — the file downloads directly. */
+    if(dDownloadCount!==null) setDownloads(dDownloadCount+1);
+    if(!sb) return;
+    sb.rpc('increment_downloads',{p_slug:'side-dock'}).then(function(res){
+      if(!res.error&&res.data!=null) setDownloads(Number(res.data));
+    }).catch(function(){});
+  });
+}
+var dDownloadApkBtn=document.getElementById('dDownloadApkBtn');
+if(dDownloadApkBtn){
+  dDownloadApkBtn.addEventListener('click',function(){
     if(dDownloadCount!==null) setDownloads(dDownloadCount+1);
     if(!sb) return;
     sb.rpc('increment_downloads',{p_slug:'side-dock'}).then(function(res){
