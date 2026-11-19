@@ -516,7 +516,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
 <section class="block wrap" id="product">
   <p class="kicker">Our tools</p>
   <h2 class="title">All your <span class="serif-i rainbow-text">tools</span>, in one place.</h2>
-  <p class="lede">Every tool here is built for everyday work — notes, tasks, checklists and more. Start with Side Dock or Zenith, and new tools will keep joining.</p>
+  <p class="lede">Every tool here is built for everyday work — notes, tasks, checklists and more. New tools will keep joining.</p>
 
   <div class="tool-filter" role="tablist" aria-label="Filter tools by platform">
     <button type="button" class="filter-pill active" data-filter="desktop" role="tab" aria-selected="true">Desktop</button>
@@ -772,7 +772,7 @@ footer{margin-top:120px;border-top:1px solid var(--line2);background:#08090c}
   document.getElementById('toolRow').innerHTML=set+'<div class="tool-set" aria-hidden="true">'+pair.repeat(8)+'</div>';
 })();
 
-// Platform filter: Desktop shows the Side Dock card, Mobile shows "Coming soon"
+// Platform filter: tool cards are hidden, so both Desktop and Mobile show an empty panel
 document.querySelectorAll('.filter-pill').forEach(function(pill){
   pill.addEventListener('click',function(){
     document.querySelectorAll('.filter-pill').forEach(function(p){
@@ -782,7 +782,7 @@ document.querySelectorAll('.filter-pill').forEach(function(pill){
     });
     var mobile=pill.getAttribute('data-filter')==='mobile';
     document.getElementById('desktopTools').style.display=mobile?'none':'';
-    document.getElementById('mobileTools').hidden=!mobile;
+    // Mobile "Coming soon" placeholder stays hidden.
   });
 });
 
